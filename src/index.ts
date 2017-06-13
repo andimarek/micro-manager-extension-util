@@ -1,5 +1,5 @@
 import { execFile, ExecFileOptions } from 'child_process';
-import {dirSync} from 'tmp';
+import { dirSync } from 'tmp';
 
 export function executeCommand(command: string, args: string[], path?: string): Promise<string> {
   mm.log.debug(`execute command ${command} ${args} in path ${path}`);
