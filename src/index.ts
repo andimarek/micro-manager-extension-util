@@ -81,3 +81,19 @@ export function createMockExtensionApi(): ExtensionApi {
   };
   return result;
 }
+export function makePath(part1: string, part2: string): string;
+export function makePath(part1: string, part2: string, part3: string): string;
+export function makePath(part1: string, part2: string, part3?: string): string {
+  if (part3) {
+    return makePath(makePath(part1, part2), part3);
+  }
+  let p1 = part1;
+  let p2 = part2;
+  if (p1.endsWith('/')) {
+    p1 = p1.substring(0, p1.length - 1);
+  }
+  if (!p2.startsWith('/')) {
+    p2 = '/' + p2;
+  }
+  return p1 + p2;
+}
