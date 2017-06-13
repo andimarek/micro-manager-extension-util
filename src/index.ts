@@ -17,3 +17,7 @@ export function executeCommand(command: string, args: string[], path?: string): 
   });
   return result;
 }
+
+export function gitClone(url: string, cloneInto: string, workDir: string): Promise<string> {
+  return executeCommand('git', ['clone', '--progress', url, cloneInto], workDir);
+}
