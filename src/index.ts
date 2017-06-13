@@ -1,5 +1,5 @@
 import { execFile, ExecFileOptions } from 'child_process';
-import { dirSync } from 'tmp';
+import { dirSync, fileSync } from 'tmp';
 const jetpack = require('fs-jetpack');
 
 export function executeCommand(command: string, args: string[], path?: string): Promise<string> {
@@ -28,12 +28,16 @@ export function gitInit(path: string): Promise<any> {
   return executeCommand('git', ['init'], path)
 }
 
-export function touchFile(path: string): void {
-  writeToFile(path, '');
+export function touchFileSync(path: string): void {
+  writeFileSync(path, '');
 }
 
-export function writeToFile(path: string, data: string | object): void {
+export function writeFileSync(path: string, data: string | object): void {
   jetpack.write(path, data);
+}
+
+export function readFileSync(path: string): string | undefined {
+  return jetpack.read(path);
 }
 
 export function gitClone(url: string, cloneInto: string, workDir: string): Promise<string> {
@@ -55,6 +59,10 @@ export function gitCommit(repoPath: string, message: string): Promise<any> {
 
 export function newTmpDir(): string {
   return dirSync().name;
+}
+
+export function newTmpFile(): string {
+  return fileSync().name;
 }
 
 export function gitStatus(path: string): Promise<string>;

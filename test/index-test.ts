@@ -1,4 +1,18 @@
-import { gitCommit, gitSetEmailAndUser, makePath, existsFile, newTmpDir, gitInit, gitAdd, touchFile, createMockExtensionApi, gitStatus } from '../src/index';
+import {
+  gitCommit,
+  gitSetEmailAndUser,
+  makePath,
+  existsFile,
+  newTmpDir,
+  gitInit,
+  gitAdd,
+  touchFileSync,
+  createMockExtensionApi,
+  gitStatus,
+  newTmpFile,
+  writeFileSync,
+  readFileSync
+} from '../src/index';
 import { expect } from 'chai';
 
 describe('test', () => {
@@ -24,11 +38,17 @@ describe('test', () => {
     await gitInit(repo);
     await gitSetEmailAndUser(repo, 'mail@example.com', 'user');
     const testFile = makePath(repo, 'test.txt');
-    await touchFile(testFile);
+    await touchFileSync(testFile);
     expect(await gitStatus(repo, 'test.txt')).to.equal('? test.txt\n');
     await gitAdd(repo, 'test.txt');
     await gitCommit(repo, 'add new file');
     expect(await gitStatus(repo, 'test.txt')).to.equal('')
+  });
+
+  it('write to file', () => {
+    const tmpFile = newTmpFile();
+    writeFileSync(tmpFile, 'test');
+    expect(readFileSync(tmpFile)).to.equal('test');
   });
 
 });
