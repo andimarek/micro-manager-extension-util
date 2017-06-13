@@ -11,7 +11,8 @@ import {
   gitStatus,
   newTmpFile,
   writeFileSync,
-  readFileSync
+  readFileSync,
+  replaceInFileSync
 } from '../src/index';
 import { expect } from 'chai';
 
@@ -49,6 +50,13 @@ describe('test', () => {
     const tmpFile = newTmpFile();
     writeFileSync(tmpFile, 'test');
     expect(readFileSync(tmpFile)).to.equal('test');
+  });
+
+  it('replace in file', () => {
+    const tmpFile = newTmpFile();
+    writeFileSync(tmpFile, 'key1, key2, key3');
+    replaceInFileSync(tmpFile, {key1: 'newKey1', key3: 'newKey3'})
+    expect(readFileSync(tmpFile)).to.equal('newKey1, key2, newKey3');
   });
 
 });

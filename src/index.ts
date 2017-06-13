@@ -36,6 +36,15 @@ export function writeFileSync(path: string, data: string | object): void {
   jetpack.write(path, data);
 }
 
+export function replaceInFileSync(path: string, toReplace: { [key: string]: string }) {
+  const currentContent = readFileSync(path);
+  let newContent = currentContent;
+  for(const key of Object.keys(toReplace)) {
+    newContent = newContent!.replace(key,toReplace[key]);
+  }
+  writeFileSync(path, newContent!);
+}
+
 export function readFileSync(path: string): string | undefined {
   return jetpack.read(path);
 }
