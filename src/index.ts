@@ -1,4 +1,5 @@
-import { execFile, ExecFileOptions } from "child_process";
+import { execFile, ExecFileOptions } from 'child_process';
+import {dirSync} from 'tmp';
 
 export function executeCommand(command: string, args: string[], path?: string): Promise<string> {
   mm.log.debug(`execute command ${command} ${args} in path ${path}`);
@@ -20,4 +21,9 @@ export function executeCommand(command: string, args: string[], path?: string): 
 
 export function gitClone(url: string, cloneInto: string, workDir: string): Promise<string> {
   return executeCommand('git', ['clone', '--progress', url, cloneInto], workDir);
+}
+
+
+export function newTmpDir(): string {
+  return dirSync().name;
 }
