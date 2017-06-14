@@ -36,6 +36,17 @@ export function writeFileSync(path: string, data: string | object): void {
   jetpack.write(path, data);
 }
 
+export function assert(value: boolean, message?: string): void {
+  if (!value) {
+    throw new Error('Assertion error' + message ? (': ' + message) : '');
+  }
+}
+
+export function assertFileExists(path: string): void {
+  const file = existsFile(path);
+  assert(file === 'file', `file ${path} doesn't exists`);
+}
+
 export function replaceInFileSync(path: string, toReplace: { [key: string]: string }) {
   const currentContent = readFileSync(path);
   let newContent = currentContent;
@@ -46,6 +57,7 @@ export function replaceInFileSync(path: string, toReplace: { [key: string]: stri
 }
 
 export function findMatchInFileSync(path: string, regex: RegExp): string[] {
+  assertFileExists(path);
   const result: string[] = [];
   const fileContent = <string>readFileSync(path);
   let execResult: RegExpMatchArray | null;

@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "test": "mocha -r ts-node/register test/*.ts"
+    "test": "tsc && mocha -r ts-node/register test/*.ts"
   },
   "author": {
     "name": "Andreas Marek",
