@@ -15,7 +15,7 @@ export function executeCommand(command: string, args: string[], path?: string): 
         reject({ error, stdout, stderr });
         return;
       }
-      mm.log('command finished with: ', stdout);
+      mm.log.debug('command finished with: ', stdout);
       resolve(stdout);
     });
   });
@@ -117,11 +117,22 @@ export function gitStatus(path: string, file?: string): Promise<string> {
   });
 }
 
+export function getGitRepoUrlForProject(projectName: string): Promise<string> {
+  return mm.getRepoForProject(projectName).then((repo) => {
+    assert(!!repo, `no repo found for project ${projectName}`);
+    assert(repo!.type === 'git', `repo has unexpected type ${repo!.type}`);
+    return repo!.url;
+  });
+}
+
 export function createMockExtensionApi(): ExtensionApi {
   const log: Logger = <any>((message: any, ...args: any[]) => { console.log(message, ...args); });
   log.error = (message: any, ...args: any[]) => { console.log('[ERROR] ' + message, ...args); };
   log.debug = (message: any, ...args: any[]) => { console.log('[DEBUG] ' + message, ...args); };
   const result: ExtensionApi = {
+    getRepoForProject(projectName: string) {
+      return Promise.resolve(undefined);
+    },
     log,
     registerTask(): Promise<void> {
       return Promise.resolve();
