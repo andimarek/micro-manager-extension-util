@@ -11,9 +11,11 @@ export function executeCommand(command: string, args: string[], path?: string): 
     }
     execFile(command, args, options, (error, stdout, stderr) => {
       if (error) {
+        mm.log.debug('command finished with error: ', error, stdout, stderr);
         reject({ error, stdout, stderr });
         return;
       }
+      mm.log('command finished with: ', stdout);
       resolve(stdout);
     });
   });
@@ -48,6 +50,8 @@ export function assertFileExists(path: string): void {
 }
 
 export function replaceInFileSync(path: string, toReplace: { [key: string]: string }) {
+  assertFileExists(path);
+  mm.log.debug('replacing ', toReplace, ' in file ', path);
   const currentContent = readFileSync(path);
   let newContent = currentContent;
   for (const key of Object.keys(toReplace)) {
@@ -89,6 +93,10 @@ export function gitCommit(repoPath: string, message: string): Promise<any> {
   return executeCommand('git', ['commit', '-m', message], repoPath);
 }
 
+export function gitCommitAll(repoPath: string, message: string): Promise<any> {
+  return executeCommand('git', ['commit', '-am', message], repoPath);
+}
+
 export function newTmpDir(): string {
   return dirSync().name;
 }
@@ -110,9 +118,9 @@ export function gitStatus(path: string, file?: string): Promise<string> {
 }
 
 export function createMockExtensionApi(): ExtensionApi {
-  const log: Logger = <any>(() => { });
-  log.error = () => { };
-  log.debug = () => { };
+  const log: Logger = <any>((message: any, ...args: any[]) => { console.log(message, ...args); });
+  log.error = (message: any, ...args: any[]) => { console.log('[ERROR] ' + message, ...args); };
+  log.debug = (message: any, ...args: any[]) => { console.log('[DEBUG] ' + message, ...args); };
   const result: ExtensionApi = {
     log,
     registerTask(): Promise<void> {
