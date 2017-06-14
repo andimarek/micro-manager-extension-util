@@ -12,7 +12,8 @@ import {
   newTmpFile,
   writeFileSync,
   readFileSync,
-  replaceInFileSync
+  replaceInFileSync,
+  findMatchInFileSync
 } from '../src/index';
 import { expect } from 'chai';
 
@@ -55,8 +56,16 @@ describe('test', () => {
   it('replace in file', () => {
     const tmpFile = newTmpFile();
     writeFileSync(tmpFile, 'key1, key2, key3');
-    replaceInFileSync(tmpFile, {key1: 'newKey1', key3: 'newKey3'})
+    replaceInFileSync(tmpFile, { key1: 'newKey1', key3: 'newKey3' })
     expect(readFileSync(tmpFile)).to.equal('newKey1, key2, newKey3');
+  });
+
+  it('find match in file', () => {
+    const tmpFile = newTmpFile();
+    writeFileSync(tmpFile, "key1\nkey2 = 'hallo' key2 = ''\nkey3");
+    const result = findMatchInFileSync(tmpFile, /^key2 = '[^']*'/);
+    expect(result.length).to.equal(1);
+    expect(result[0]).to.equal("key2 = 'hallo'");
   });
 
 });

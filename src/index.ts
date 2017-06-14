@@ -39,10 +39,21 @@ export function writeFileSync(path: string, data: string | object): void {
 export function replaceInFileSync(path: string, toReplace: { [key: string]: string }) {
   const currentContent = readFileSync(path);
   let newContent = currentContent;
-  for(const key of Object.keys(toReplace)) {
-    newContent = newContent!.replace(key,toReplace[key]);
+  for (const key of Object.keys(toReplace)) {
+    newContent = newContent!.replace(key, toReplace[key]);
   }
   writeFileSync(path, newContent!);
+}
+
+export function findMatchInFileSync(path: string, regex: RegExp): string[] {
+  const result: string[] = [];
+  const fileContent = <string>readFileSync(path);
+  let execResult: RegExpMatchArray | null;
+  const globalRegEx = new RegExp(regex.source, 'gm');
+  while ((execResult = globalRegEx.exec(fileContent)) !== null) {
+    result.push(execResult![0]);
+  }
+  return result;
 }
 
 export function readFileSync(path: string): string | undefined {
