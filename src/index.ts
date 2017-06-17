@@ -80,8 +80,16 @@ export function readFileSync(path: string): string | undefined {
   return jetpack.read(path);
 }
 
+export function gitSetConfig(repoPath: string, key: string, value: string): Promise<any> {
+  return executeCommand('git', ['config', '--local', key, value], repoPath)
+}
+
 export function gitClone(url: string, cloneInto: string, workDir: string): Promise<string> {
   return executeCommand('git', ['clone', '--progress', url, cloneInto], workDir);
+}
+
+export function gitPush(repoPath: string, remoteRepo: string = 'origin'): Promise<string> {
+  return executeCommand('git', ['push', remoteRepo], repoPath);
 }
 
 export function gitSetEmailAndUser(repoPath: string, email: string, user: string): Promise<any> {
@@ -110,7 +118,7 @@ export function newTmpFile(): string {
 }
 
 export function ensureDirExistsSync(path: string, mustBeEmpty: boolean = true) {
-  jetpack.dir(path, {empty: mustBeEmpty});
+  jetpack.dir(path, { empty: mustBeEmpty });
   return path;
 }
 
@@ -160,6 +168,9 @@ export function createMockExtensionApi(mockConfig?: mockConfig): ExtensionApi {
 export function createSimpleRepo(repoPath: string, files: { [fileName: string]: string }): Promise<string> {
   const fileNames = Object.keys(files);
   return gitInit(repoPath)
+    .then(() => {
+      gitSetConfig(repoPath, 'receive.denyCurrentBranch', 'updateInstead')
+    })
     .then(() => {
       const filePromises = fileNames.map((fileName) => writeFile(makePath(repoPath, fileName), files[fileName]));
       return Promise.all(filePromises);
