@@ -38,6 +38,10 @@ export function writeFileSync(path: string, data: string | object): void {
   jetpack.write(path, data);
 }
 
+export function writeFile(path: string, data: string | object): Promise<void> {
+  return jetpack.writeAsync(path, data);
+}
+
 export function assert(value: boolean, message?: string): void {
   if (!value) {
     throw new Error('Assertion error' + message ? (': ' + message) : '');
@@ -105,6 +109,11 @@ export function newTmpFile(): string {
   return fileSync().name;
 }
 
+export function ensureDirExistsSync(path: string, mustBeEmpty: boolean = true) {
+  jetpack.dir(path, {empty: mustBeEmpty});
+  return path;
+}
+
 export function gitStatus(path: string): Promise<string>;
 export function gitStatus(path: string, file: string): Promise<string>;
 export function gitStatus(path: string, file?: string): Promise<string> {
@@ -125,13 +134,20 @@ export function getGitRepoUrlForProject(projectName: string): Promise<string> {
   });
 }
 
-export function createMockExtensionApi(): ExtensionApi {
+export interface mockConfig {
+  repoByProject: { [projectName: string]: Repository };
+}
+
+export function createMockExtensionApi(mockConfig?: mockConfig): ExtensionApi {
+  const repoByProject = mockConfig ? mockConfig.repoByProject : {};
+
   const log: Logger = <any>((message: any, ...args: any[]) => { console.log(message, ...args); });
   log.error = (message: any, ...args: any[]) => { console.log('[ERROR] ' + message, ...args); };
   log.debug = (message: any, ...args: any[]) => { console.log('[DEBUG] ' + message, ...args); };
+
   const result: ExtensionApi = {
     getRepoForProject(projectName: string) {
-      return Promise.resolve(undefined);
+      return Promise.resolve(repoByProject[projectName]);
     },
     log,
     registerTask(): Promise<void> {
@@ -140,6 +156,23 @@ export function createMockExtensionApi(): ExtensionApi {
   };
   return result;
 }
+
+export function createSimpleRepo(repoPath: string, files: { [fileName: string]: string }): Promise<string> {
+  const fileNames = Object.keys(files);
+  return gitInit(repoPath)
+    .then(() => {
+      const filePromises = fileNames.map((fileName) => writeFile(makePath(repoPath, fileName), files[fileName]));
+      return Promise.all(filePromises);
+    })
+    .then(() => {
+      const addPromises = fileNames.map((fielName) => gitAdd(repoPath, fielName));
+      return Promise.all(addPromises);
+    })
+    .then(() => gitSetEmailAndUser(repoPath, 'dummy@example.com', 'dummy'))
+    .then(() => gitCommitAll(repoPath, 'commit simple repo content'))
+    .then(() => repoPath);
+}
+
 export function makePath(part1: string, part2: string): string;
 export function makePath(part1: string, part2: string, part3: string): string;
 export function makePath(part1: string, part2: string, part3?: string): string {
