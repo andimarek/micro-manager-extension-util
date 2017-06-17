@@ -3,3 +3,5 @@ node_modules
 yarn.lock
 tsconfig.json
 webpack.config.js
+.travis.yml
+test
