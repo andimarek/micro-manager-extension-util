@@ -84,8 +84,8 @@ export function gitSetConfig(repoPath: string, key: string, value: string): Prom
   return executeCommand('git', ['config', '--local', key, value], repoPath)
 }
 
-export function gitClone(url: string, cloneInto: string, workDir: string): Promise<string> {
-  return executeCommand('git', ['clone', '--progress', url, cloneInto], workDir);
+export function gitClone(url: string, cloneInto: string, workDir: string, branch: string = 'master'): Promise<string> {
+  return executeCommand('git', ['clone', '--progress', '-b', branch, url, cloneInto], workDir);
 }
 
 export function gitPush(repoPath: string, remoteRepo: string = 'origin'): Promise<string> {
