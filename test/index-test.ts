@@ -13,7 +13,9 @@ import {
   writeFileSync,
   readFileSync,
   replaceInFileSync,
-  findMatchInFileSync
+  findMatchInFileSync,
+  createSimpleBarRepoWithBranches,
+  gitClone
 } from '../src/index';
 import { expect } from 'chai';
 
@@ -66,6 +68,28 @@ describe('test', () => {
     const result = findMatchInFileSync(tmpFile, /^key2 = '[^']*'/);
     expect(result.length).to.equal(1);
     expect(result[0]).to.equal("key2 = 'hallo'");
+  });
+
+  it('create bare repo', () => {
+    const tmpDir = newTmpDir();
+    const targetDir = newTmpDir();
+    const masterDir = makePath(targetDir, 'master');
+    const branchDir = makePath(targetDir, 'branch');
+    return createSimpleBarRepoWithBranches(tmpDir, {
+      master: {
+        file1: 'Hello 1'
+      },
+      otherBranch: {
+        file2: 'hello 2'
+      }
+    }).then(() => {
+      return gitClone(tmpDir, masterDir, targetDir);
+    }).then(() => {
+      return gitClone(tmpDir, branchDir, targetDir, 'otherBranch');
+    }).then(() => {
+      expect(readFileSync(makePath(masterDir,'file1'))).to.equal('Hello 1');
+      expect(readFileSync(makePath(masterDir,'file2'))).to.equal('Hello 2');
+    });
   });
 
 });

@@ -30,6 +30,10 @@ export function gitInit(path: string): Promise<any> {
   return executeCommand('git', ['init'], path)
 }
 
+export function gitInitBare(path: string): Promise<string> {
+  return executeCommand('git', ['init', '--bare'], path);
+}
+
 export function touchFileSync(path: string): void {
   writeFileSync(path, '');
 }
@@ -182,6 +186,14 @@ export function createSimpleRepo(repoPath: string, files: { [fileName: string]: 
     .then(() => gitSetEmailAndUser(repoPath, 'dummy@example.com', 'dummy'))
     .then(() => gitCommitAll(repoPath, 'commit simple repo content'))
     .then(() => repoPath);
+}
+
+export interface FilesWithContent {
+  [fileName: string]: string;
+}
+export function createSimpleBarRepoWithBranches(repoPath: string, filesByBranch: { [branchName: string]: FilesWithContent }): Promise<string> {
+  return gitInitBare(repoPath);
+
 }
 
 export function makePath(part1: string, part2: string): string;
