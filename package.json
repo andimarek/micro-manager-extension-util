@@ -1,6 +1,6 @@
 {
   "name": "micro-manager-extension-util",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "utils for writing micro-manager extensions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
