@@ -203,7 +203,7 @@ export interface FilesWithContent {
   [fileName: string]: string;
 }
 
-export function createSimpleBarRepoWithBranches(repoPath: string, filesByBranch: { [branchName: string]: FilesWithContent }): Promise<any> {
+export function createSimpleBareRepoWithBranches(repoPath: string, filesByBranch: { [branchName: string]: FilesWithContent }): Promise<any> {
   return gitInitBare(repoPath)
     .then(() => {
       const branches = Object.keys(filesByBranch);

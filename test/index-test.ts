@@ -14,7 +14,7 @@ import {
   readFileSync,
   replaceInFileSync,
   findMatchInFileSync,
-  createSimpleBarRepoWithBranches,
+  createSimpleBareRepoWithBranches,
   gitClone
 } from '../src/index';
 import { expect } from 'chai';
@@ -76,7 +76,7 @@ describe('test', () => {
     const masterDir = makePath(targetDir, 'master');
     const branchDir = makePath(targetDir, 'branch');
     console.log('creating test repo in ', tmpDir);
-    return createSimpleBarRepoWithBranches(tmpDir, {
+    return createSimpleBareRepoWithBranches(tmpDir, {
       master: {
         file1: 'Hello 1'
       },
