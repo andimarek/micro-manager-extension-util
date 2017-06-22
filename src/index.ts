@@ -15,7 +15,7 @@ export function executeCommand(command: string, args: string[], path?: string): 
         reject({ error, stdout, stderr });
         return;
       }
-      mm.log.debug('command finished with: ', stdout);
+      mm.log.debug('command succesfully finished with: ', !!stdout ? stdout : '<NO OUTPUT>');
       resolve(stdout);
     });
   });
@@ -113,6 +113,17 @@ export function gitCommitAll(repoPath: string, message: string): Promise<any> {
   return executeCommand('git', ['commit', '-am', message], repoPath);
 }
 
+export function gitAddRemoteRepo(repoPath: string, remoteRepoName: string, remoteRepoUrl: string): Promise<any> {
+  return executeCommand('git', ['remote', 'add', remoteRepoName, remoteRepoUrl], repoPath);
+}
+
+export function gitPushBranchToNewRemoteRepo(repoPath: string, localBranch: string, remoteBranch: string, remoteRepoName: string, remoteRepoUrl: string): Promise<any> {
+  return gitAddRemoteRepo(repoPath, remoteRepoName, remoteRepoUrl)
+    .then(() => {
+      return executeCommand('git', ['push', remoteRepoName, localBranch + ':' + remoteBranch], repoPath);
+    });
+}
+
 export function newTmpDir(): string {
   return dirSync().name;
 }
@@ -191,9 +202,23 @@ export function createSimpleRepo(repoPath: string, files: { [fileName: string]: 
 export interface FilesWithContent {
   [fileName: string]: string;
 }
-export function createSimpleBarRepoWithBranches(repoPath: string, filesByBranch: { [branchName: string]: FilesWithContent }): Promise<string> {
-  return gitInitBare(repoPath);
 
+export function createSimpleBarRepoWithBranches(repoPath: string, filesByBranch: { [branchName: string]: FilesWithContent }): Promise<any> {
+  return gitInitBare(repoPath)
+    .then(() => {
+      const branches = Object.keys(filesByBranch);
+      const promises: Promise<any>[] = [];
+      for (const branch of branches) {
+        const tmpDir = newTmpDir();
+        promises.push(createSimpleRepo(tmpDir, filesByBranch[branch])
+          .then(() => {
+            return gitPushBranchToNewRemoteRepo(tmpDir, 'master', branch, 'origin', repoPath);
+          }));
+      }
+      return Promise.all(promises);
+    })
+    .then(() => {
+    });
 }
 
 export function makePath(part1: string, part2: string): string;

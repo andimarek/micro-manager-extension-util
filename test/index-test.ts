@@ -75,12 +75,13 @@ describe('test', () => {
     const targetDir = newTmpDir();
     const masterDir = makePath(targetDir, 'master');
     const branchDir = makePath(targetDir, 'branch');
+    console.log('creating test repo in ', tmpDir);
     return createSimpleBarRepoWithBranches(tmpDir, {
       master: {
         file1: 'Hello 1'
       },
       otherBranch: {
-        file2: 'hello 2'
+        file2: 'Hello 2'
       }
     }).then(() => {
       return gitClone(tmpDir, masterDir, targetDir);
@@ -88,7 +89,7 @@ describe('test', () => {
       return gitClone(tmpDir, branchDir, targetDir, 'otherBranch');
     }).then(() => {
       expect(readFileSync(makePath(masterDir,'file1'))).to.equal('Hello 1');
-      expect(readFileSync(makePath(masterDir,'file2'))).to.equal('Hello 2');
+      expect(readFileSync(makePath(branchDir,'file2'))).to.equal('Hello 2');
     });
   });
 
